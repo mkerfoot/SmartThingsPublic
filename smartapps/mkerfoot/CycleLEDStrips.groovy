@@ -51,8 +51,8 @@ def mainPage() {
 		}
 		section("Options...") {
 			input "lightLevel", "enum", title: "Select brightness", required: true, options: [[10:"10%"],[20:"20%"],[30:"30%"],[40:"40%"],[50:"50%"],[60:"60%"],[70:"70%"],[80:"80%"],[90:"90%"],[100:"100%"]]
-			input "cycleSec", "integer", title: "Interval between colors", required: true, defaultValue:5
-			input "cycleStep", "integer", title: "Hue steps per interval", required: true, defaultValue:1
+			input "cycleSec", "integer", title: "Interval between colors", required: true, defaultValue:9
+			input "cycleStep", "integer", title: "Hue steps per interval", required: true, defaultValue:9
 		}
 		section([mobileOnly:true]) {
 			label title: "Assign this SmartApp a name", required: false
@@ -96,6 +96,15 @@ def eventHandlerOff(evt) {
     hues?.off()
 }
 
+private def myRunIn(delay_s, func) {
+    if (delay_s > 0) {
+        def tms = now() + (delay_s * 1000)
+        def date = new Date(tms)
+        runOnce(date, func)
+        log.trace("runOnce() scheduled for ${date}")
+    }
+}
+
 def nextColor() {
 	if (settings.cycleStep < 1) { settings.cycleStep = 1 }
 	if (settings.cycleSec  < 1) { settings.cycleSec  = 1 }
@@ -120,13 +129,4 @@ def nextColor() {
 
 	hues*.setColor(newValue)
     myRunIn(1, "nextColor")
-}
-
-private def myRunIn(delay_s, func) {
-    if (delay_s > 0) {
-        def tms = now() + (delay_s * 1000)
-        def date = new Date(tms)
-        runOnce(date, func)
-        log.trace("runOnce() scheduled for ${date}")
-    }
 }
